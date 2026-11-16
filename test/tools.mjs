@@ -32,7 +32,7 @@ const ctx = {
 };
 
 plugin.apply(ctx, {});
-if (plugin.name !== 'workbuddy-growth') throw new Error('plugin name drifted');
+if (plugin.name !== 'workbuddy-connect') throw new Error('plugin name drifted');
 if (!Array.isArray(plugin.inject) || !plugin.inject.includes('tools')) throw new Error('inject drifted');
 if (registered.length !== 3) throw new Error(`expected 3 tools, got ${registered.length}`);
 

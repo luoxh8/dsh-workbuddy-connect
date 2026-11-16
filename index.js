@@ -20,7 +20,7 @@
  * No credential is ever logged or returned; `describe()` shows a masked token and
  * nothing more.
  *
- * @module dsh-workbuddy-growth
+ * @module dsh-workbuddy-connect
  */
 
 import { defaultVaultDir, ensureFresh, loadAccounts, masked, report } from './lib/upstream.js';
@@ -29,7 +29,7 @@ import * as growth from './lib/growth.js';
 import { eventsFor } from './lib/actions.js';
 
 /** Cordis plugin name used by loader diagnostics. */
-export const name = 'workbuddy-growth';
+export const name = 'workbuddy-connect';
 
 /** Services required before the tools can register. */
 export const inject = ['tools'];

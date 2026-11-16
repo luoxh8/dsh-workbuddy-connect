@@ -1,8 +1,8 @@
-# dsh-workbuddy-growth
+# dsh-workbuddy-connect
 
 WorkBuddy 成长中心（积分活动）的 DSH 工具包：给账号池里的每个账号跑每日签到、五个成长任务、猫猫宠物与旅行。
 
-它与官方 `dsh-connect-workbuddy` **分工不重叠**：
+它与官方 `dsh-connect-workbuddy` **分工不重叠**，但**共用同一个账号池**：
 
 | | `dsh-connect-workbuddy` | 本包 |
 | --- | --- | --- |
@@ -10,15 +10,17 @@ WorkBuddy 成长中心（积分活动）的 DSH 工具包：给账号池里的�
 | 凭据来源 | 写 vault | **读同一个 vault**，不重复登录流程 |
 | 写操作 | 签到（`daily-checkin`） | 签到、接受任务、领任务奖、开宠物、派/收旅行 |
 
-两个包读同一份 `~/.dsh/workbuddy-vault/<region>/<accountId>.json`，账号池只有一个真相来源。
+两个包读同一份 `~/.dsh/workbuddy-vault/<region>/<accountId>.json`，账号池只有一个真相来源。装本包**不需要**再登一次账号：`dsh-connect-workbuddy` 已经把 token 写进 vault 了。
 
 ## 安装
 
-本包是 **host-only bundle**（没有客户端 UI），`package.json` 的 `dsh.bundle.patch` 指向 `cordis.patch.yml`，安装后会往 profile 的 cordis 配置里插一条 `workbuddy-growth` 条目。
+本包是 **host-only bundle**（没有客户端 UI），`package.json` 的 `dsh.bundle.patch` 指向 `cordis.patch.yml`，安装后会往 profile 的 cordis 配置里插一条 `workbuddy-connect` 条目。
+
+在 DSH 里用 `plugin_manager install_bundle`，`target` 传本目录的绝对路径即可；也可以先把仓库克隆到本地再装：
 
 ```powershell
-# 让 DSH 认这个本地目录
-# 在 DSH 里用 plugin_manager install_bundle，target 传本目录的绝对路径
+git clone git@github.com:luoxh8/dsh-workbuddy-connect.git
+# 然后 plugin_manager install_bundle --target <克隆下来的目录>
 ```
 
 装完重启 DSH，工具列表里出现三个 `workbuddy_growth_*`。
@@ -30,7 +32,7 @@ WorkBuddy 成长中心（积分活动）的 DSH 工具包：给账号池里的�
 只读。逐账号回报签到、积分、连续天数、成长等级、能量、宠物、旅行状态与五个任务进度，外加一句「下一步该做什么」。
 
 ```
-workbuddy_growth_status({ accounts: [] })      // 全部账号
+workbuddy_growth_status({ accounts: [] })       // 全部账号
 workbuddy_growth_status({ accounts: ["Kris"] }) // 按 id / 昵称 / uid 前缀筛
 ```
 
@@ -47,9 +49,9 @@ workbuddy_growth_status({ accounts: ["Kris"] }) // 按 id / 昵称 / uid 前缀�
 7. 再读一次任务状态收尾
 
 ```js
-workbuddy_growth_run({ apply: true })                                  // 全账号
-workbuddy_growth_run({ apply: true, report: ["share"], locationId: 1 }) // 顺带推技能分享 + 指定咖啡馆
-workbuddy_growth_run({ apply: false })                                 // 演练：只回报下一步
+workbuddy_growth_run({ apply: true })                                   // 全账号
+workbuddy_growth_run({ apply: true, report: ["share"], locationId: 1 })  // 顺带推技能分享 + 指定咖啡馆
+workbuddy_growth_run({ apply: false })                                  // 演练：只回报下一步
 ```
 
 `apply` 是本包唯一的安全闸：不给 `true` 就一个写请求都不发。
@@ -79,8 +81,8 @@ workbuddy_growth_run({ apply: false })                                 // 演练
 ## 配置
 
 ```yaml
-- id: workbuddy-growth
-  name: dsh-workbuddy-growth
+- id: workbuddy-connect
+  name: dsh-workbuddy-connect
   config:
     region: cn          # vault 子目录，默认 cn
     vaultDir: ''        # 直接指定 vault 目录时用；留空走 ~/.dsh/workbuddy-vault/<region>
@@ -100,6 +102,8 @@ node test/tools.mjs         # 假 ctx 注册三个工具 + 用真校验器验 sc
 - `lib/actions.js` — 三批遥测事件
 - `lib/daily.js` — 一天的动作序列
 - `index.js` — 工具定义（`parameters` 是 JSON Schema，不是 spec 形式）
+
+工具名保留 `workbuddy_growth_*` 前缀：它们描述的是「成长中心」这个功能区，与包名 `dsh-workbuddy-connect`（连接 WorkBuddy 账号池）互不冲突。
 
 ## 许可
 

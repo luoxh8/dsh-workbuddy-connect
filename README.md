@@ -68,15 +68,25 @@ workbuddy_growth_run({ apply: false })                                  // 演�
 
 `sent` 成功只代表**遥测入口收下了**，不代表任务推进 —— 工具会顺手再读一次任务状态，把「已完成」的清单一起回给你，真假一目了然。
 
-## 硬边界（别指望脚本能全自动）
+## 硬边界与突破方法（实测结论）
 
-以下三条是服务端的判定，不是本包的实现缺陷：
+成长任务的完成度由**服务端埋点**判定，纯 API 伪造 `/v2/report` 事件对 `RichMeow_Chat` / `Library_read` 一律无效（HTTP 200 但进度恒 0）。经实测，正确做法是**用真实桌面客户端跑一遍动作**：
 
-- **`RichMeow_Chat`**（桌面端对话 1 次）只认真实桌面客户端会话链路。
-- **`Library_read`**（读完资料库介绍）在客户端里根本没有埋点，服务端另有判定。
-- **`wb_wechat_oa_subscribe_task`**（关注公众号满 24 小时）需要真实关注，且同一微信号只能领一次。
+- **`RichMeow_Chat`**（桌面端对话 1 次）：在登录了目标账号的 WorkBuddy 客户端里真发一条消息即可。
+- **`Library_read`**（读完资料库介绍）：在客户端「资料库」里打开 `WorkBuddy资料库介绍.html` 并把 iframe 内的文档滚到底，服务端即置为 `completed`，再调 claim 领 50 分。
+- **`skill_share`**：唯一能用本包 `report` 工具纯 API 推动的任务（六连事件，实测到 `completed`）。
+- **`wb_wechat_oa_subscribe_task`**（关注公众号满 24 小时）：判定完全在微信侧（openid + 关注时长）。`/v2/activity/growth/subscribe-task/status` 返回 `subscribed:false / advanced:false`，所有 `*claim/*advance/*refresh` 变体接口都不存在；`claim` 直接返回 `task not completed`。**只能真人微信扫码关注「腾讯 WorkBuddy」公众号并等满 24 小时**，同一微信号只能领一次，脚本与客户端自动化都推进不了。
 
-所以每天纯脚本能拿满的大致是：签到 100 + 新手任务 300（仅首次）+ 技能分享 50 + 旅行 5~10。
+### 用 CDP 驱动客户端完成对话/阅读（可复用的自动化套路）
+
+多开一个隔离的 WorkBuddy 客户端实例，注入目标账号登录态后开 `--remote-debugging-port`，用 CDP 直接读 DOM、点导航、在跨域 iframe 里滚动。要点：
+
+1. 登录文件必须写到 `<sandbox>\home\AppData\Local\CodeBuddyExtension\Data\Public\auth\workbuddy-desktop.info`（客户端按 `os.homedir()` 解析，少一层 `home\` 就会 `noAuthFile`）。
+2. 启动前 `Remove-Item Env:ELECTRON_RUN_AS_NODE`（DSH 环境自带这个变量，不删会让 WorkBuddy 当 Node 跑）。
+3. 杀旧实例匹配要用宽松模式 `*wbx*$Account*`（反斜杠会被命令行转义）。
+4. CDP 读 DOM 用 `Runtime.evaluate`；文档在跨域 iframe 里，要对 iframe 自己的 target 建 WebSocket 才能 `window.scrollTo`。
+
+因此每天能自动拿满的是：签到 100 + 新手任务 300（仅首次）+ 技能分享 50 + 对话 50 + 阅读 50 + 旅行 5~10；公众号那 50 分需真人补一次。
 
 ## 配置
 

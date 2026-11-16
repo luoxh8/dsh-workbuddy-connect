@@ -1,0 +1,6 @@
+# Register the growth-centre tools as their own bundle entry. The tools read the
+# same vault `dsh-connect-workbuddy` writes, so no credential flow is repeated
+# here and the account pool stays a single source of truth.
+- insert:
+    - id: workbuddy-growth
+      name: dsh-workbuddy-growth

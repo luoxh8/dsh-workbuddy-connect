@@ -1,0 +1,37 @@
+{
+  "name": "dsh-workbuddy-growth",
+  "version": "0.1.0",
+  "private": true,
+  "description": "WorkBuddy growth-centre tools for DeepSeek Harness: daily check-in, the five growth tasks, the buddy and its trip, across the DSH account pool.",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./package.json": "./package.json",
+    "./locale/*.json": "./locale/*.json"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "keywords": [
+    "dsh-plugin",
+    "dsh-bundle",
+    "deepseek-harness",
+    "workbuddy",
+    "checkin"
+  ],
+  "files": [
+    "index.js",
+    "lib",
+    "locale",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "license": "MIT"
+}

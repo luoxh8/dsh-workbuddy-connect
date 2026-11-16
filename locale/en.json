@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "WorkBuddy Growth Centre",
+    "description": "Daily check-in, the five growth tasks, the buddy and its trip, for every account in the pool.",
+    "detail": "Reads the same vault dsh-connect-workbuddy writes and runs each pooled account's daily loop: check in, accept tasks, collect rewards, send the buddy travelling. Task completion is decided by the service; this bundle only replays the events the desktop client would have sent and reports progress honestly."
+  }
+}
